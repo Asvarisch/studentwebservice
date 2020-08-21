@@ -12,8 +12,8 @@ import telran.ashkelon2020.student.dto.StudentUpdateDto;
 import telran.ashkelon2020.student.dto.exceptions.StudentNotFoundException;
 import telran.ashkelon2020.student.model.Student;
 
-//@Service
-public class StudentServiceImpl implements StudentService {
+@Service
+public class StudentServiceUsingModelmapper implements StudentService {
 	
 	@Autowired
 	StudentRepository studentRepository;
@@ -33,9 +33,8 @@ public class StudentServiceImpl implements StudentService {
 		if (student == null) {
 			throw new StudentNotFoundException(id);
 		}else {
-			return convertStudentToStudentResponseDto(student);
+			return modelMapper.map(student, StudentResponseDto.class);
 		}
-		
 	}
 
 	@Override
@@ -44,15 +43,7 @@ public class StudentServiceImpl implements StudentService {
 		if (student == null) {
 			throw new StudentNotFoundException(id);
 		}
-		return convertStudentToStudentResponseDto(student);
-	}
-
-	private StudentResponseDto convertStudentToStudentResponseDto(Student student) {
-		return StudentResponseDto.builder()
-				.id(student.getId())
-				.name(student.getName())
-				.scores(student.getScores())
-				.build();
+		return modelMapper.map(student, StudentResponseDto.class);
 	}
 
 	@Override
@@ -69,15 +60,8 @@ public class StudentServiceImpl implements StudentService {
 		if (password == null) {
 			password = student.getPassword();
 		}
-		return convertStudentToStudentDto(studentRepository.updateStudent(id, name, password));
-	}
-
-	private StudentDto convertStudentToStudentDto(Student student) {
-		return StudentDto.builder()
-				.id(student.getId())
-				.name(student.getName())
-				.password(student.getPassword())
-				.build();
+		studentRepository.updateStudent(id, name, password);
+		return modelMapper.map(student, StudentDto.class);
 	}
 
 	@Override
